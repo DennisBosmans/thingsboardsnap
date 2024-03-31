@@ -1,29 +1,31 @@
 name: node-red-nats-cli
-base: core20 # the base snap is the execution environment
+base: core20
 version: '1.0'
 summary: ThingsBoard IoT Gateway
 description: |
   This snap installs and runs ThingsBoard IoT Gateway, which helps you to integrate devices connected to legacy and third-party systems with ThingsBoard.
 
-confinement: strict # use 'strict' to enforce confinement.
-grade: stable # use 'stable' if this snap is to be released to the stable snaps channel
+confinement: strict
+grade: stable
 
 parts:
   thingsboard-gateway:
     plugin: python
-    python-version: python3
     source: https://github.com/thingsboard/thingsboard-gateway.git
     build-packages:
       - python3-pip
       - python3-setuptools
-    stage-packages:
-      - python3-pip
-      - python3-setuptools
+      - python3-wheel  # Mogelijk nodig voor bepaalde Python dependencies
+    override-pull: |
+      snapcraftctl pull
+      # Voeg hier eventuele pull acties toe indien nodig
     override-build: |
-      snapcraftctl build
+      python3 -m venv $SNAPCRAFT_PART_INSTALL
+      . $SNAPCRAFT_PART_INSTALL/bin/activate
       pip install -r requirements.txt
+      python setup.py install
 
 apps:
   thingsboard-gateway:
-    command: python3 -m thingsboard_gateway
+    command: bin/python3 -m thingsboard_gateway
     plugs: [network, network-bind, home]
