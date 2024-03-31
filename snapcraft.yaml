@@ -1,6 +1,6 @@
 name: node-red-nats-cli
 base: core20
-version: '1.0'
+version: '1.01'
 summary: ThingsBoard IoT Gateway
 description: |
   This snap installs and runs ThingsBoard IoT Gateway, which helps you to integrate devices connected to legacy and third-party systems with ThingsBoard.
@@ -22,6 +22,7 @@ parts:
     override-build: |
       python3 -m venv $SNAPCRAFT_PART_INSTALL
       . $SNAPCRAFT_PART_INSTALL/bin/activate
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
       python setup.py install
 
