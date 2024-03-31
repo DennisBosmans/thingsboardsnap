@@ -1,4 +1,4 @@
-name: thingsboard-gateway
+name: node-red-nats-cli
 base: core20 # the base snap is the execution environment
 version: '1.0'
 summary: ThingsBoard IoT Gateway
