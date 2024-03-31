@@ -1,0 +1,29 @@
+name: thingsboard-gateway
+base: core20 # the base snap is the execution environment
+version: '1.0'
+summary: ThingsBoard IoT Gateway
+description: |
+  This snap installs and runs ThingsBoard IoT Gateway, which helps you to integrate devices connected to legacy and third-party systems with ThingsBoard.
+
+confinement: strict # use 'strict' to enforce confinement.
+grade: stable # use 'stable' if this snap is to be released to the stable snaps channel
+
+parts:
+  thingsboard-gateway:
+    plugin: python
+    python-version: python3
+    source: https://github.com/thingsboard/thingsboard-gateway.git
+    build-packages:
+      - python3-pip
+      - python3-setuptools
+    stage-packages:
+      - python3-pip
+      - python3-setuptools
+    override-build: |
+      snapcraftctl build
+      pip install -r requirements.txt
+
+apps:
+  thingsboard-gateway:
+    command: python3 -m thingsboard_gateway
+    plugs: [network, network-bind, home]
