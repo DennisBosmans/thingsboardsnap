@@ -1,0 +1,48 @@
+name: node-red-nats-cli
+base: core20  # core20 is gebaseerd op Ubuntu 20.04 en heeft standaard Python 3.8
+version: '1.03'
+summary: ThingsBoard IoT Gateway
+description: |
+  This snap installs and runs ThingsBoard IoT Gateway, which helps you to integrate devices connected to legacy and third-party systems with ThingsBoard.
+
+confinement: strict
+grade: stable
+
+parts:
+  thingsboard-gateway:
+    plugin: nil  # Gebruik 'nil' als plugin wanneer een aangepast bouwscript nodig is
+    override-build: |
+      # Installeer pyenv
+      git clone https://github.com/pyenv/pyenv.git $SNAPCRAFT_PART_BUILD/pyenv
+      export PYENV_ROOT="$SNAPCRAFT_PART_BUILD/pyenv"
+      export PATH="$PYENV_ROOT/bin:$PATH"
+      eval "$(pyenv init --path)"
+      
+      # Installeer Python 3.7 (of vervang door een hogere versie indien nodig)
+      pyenv install 3.7.10
+      pyenv global 3.7.10
+      
+      # Controleer de Python-versie
+      python --version
+      
+      # Ga verder met de bouw van je applicatie
+      pip install --upgrade pip setuptools wheel
+      pip install -r requirements.txt
+      python setup.py install
+      
+      # Kopieer de gebouwde applicatie naar het installatiedirectory van de snap
+      cp -r . $SNAPCRAFT_PART_INSTALL
+    build-packages:
+      - git
+      - build-essential
+      - libssl-dev
+      - libffi-dev
+      - python3-dev
+      - python3-pip
+      - python3-setuptools
+      - python3-wheel
+
+apps:
+  thingsboard-gateway:
+    command: pyenv exec python3 -m thingsboard_gateway
+    plugs: [network, network-bind, home]
