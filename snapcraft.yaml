@@ -1,4 +1,4 @@
-name: node-red-nats-cli
+name: thingsboardsnap
 base: core20  # core20 is gebaseerd op Ubuntu 20.04 en heeft standaard Python 3.8
 version: '1.03'
 summary: ThingsBoard IoT Gateway
