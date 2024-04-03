@@ -1,6 +1,6 @@
 name: thingsboardsnap
-base: core20  # core20 is gebaseerd op Ubuntu 20.04 en heeft standaard Python 3.8
-version: '1.03'
+base: core20
+version: '1.4'
 summary: ThingsBoard IoT Gateway
 description: |
   This snap installs and runs ThingsBoard IoT Gateway, which helps you to integrate devices connected to legacy and third-party systems with ThingsBoard.
@@ -8,41 +8,29 @@ description: |
 confinement: strict
 grade: stable
 
+architectures:
+  - build-on: arm64
+  - build-on: armhf
+
 parts:
   thingsboard-gateway:
-    plugin: nil  # Gebruik 'nil' als plugin wanneer een aangepast bouwscript nodig is
+    plugin: python
+    source: https://github.com/thingsboard/thingsboard-gateway.git
+    build-packages:
+      - python3-pip
+      - python3-setuptools
+      - python3-wheel  # Mogelijk nodig voor bepaalde Python dependencies
+    override-pull: |
+      snapcraftctl pull
+      # Voeg hier eventuele pull acties toe indien nodig
     override-build: |
-      # Installeer pyenv
-      git clone https://github.com/pyenv/pyenv.git $SNAPCRAFT_PART_BUILD/pyenv
-      export PYENV_ROOT="$SNAPCRAFT_PART_BUILD/pyenv"
-      export PATH="$PYENV_ROOT/bin:$PATH"
-      eval "$(pyenv init --path)"
-      
-      # Installeer Python 3.7 (of vervang door een hogere versie indien nodig)
-      pyenv install 3.7.10
-      pyenv global 3.7.10
-      
-      # Controleer de Python-versie
-      python --version
-      
-      # Ga verder met de bouw van je applicatie
+      python3 -m venv $SNAPCRAFT_PART_INSTALL
+      . $SNAPCRAFT_PART_INSTALL/bin/activate
       pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
       python setup.py install
-      
-      # Kopieer de gebouwde applicatie naar het installatiedirectory van de snap
-      cp -r . $SNAPCRAFT_PART_INSTALL
-    build-packages:
-      - git
-      - build-essential
-      - libssl-dev
-      - libffi-dev
-      - python3-dev
-      - python3-pip
-      - python3-setuptools
-      - python3-wheel
 
 apps:
   thingsboard-gateway:
-    command: pyenv exec python3 -m thingsboard_gateway
+    command: bin/python3 -m thingsboard_gateway
     plugs: [network, network-bind, home]
